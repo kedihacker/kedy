@@ -24,23 +24,35 @@ type BTree struct {
 // }
 
 //right items copyied to new node
-func (n *node) split() (int, *node) {
-	new := node{} //new
-	split_index := len(n.items) / 2
-	item := n.items[split_index]                            //set index
-	new.items = append(new.items, n.items[split_index:]...) //copy items
-	new_array := make([]int, 5)                             //new array
-	copy(new_array, n.items[:split_index])                  //turnucatw array
-
-	n.items = new_array //ASSİNG array
-
+func (n *node) split() (int, *node, bool) {
+	new := node{}                   //new
+	split_index := len(n.items) / 2 // index to cut
+	item := n.items[split_index]    // does item retrivition
+	var leaf bool
 	if len(n.child) > 0 { //if isnt leaf
-		new.child = append(new.child, n.child[split_index:]...) //copy items
-		new_array2 := make([]*node, 5)                          //new array
-		copy(new_array2, n.child[:split_index])                 //copy child
-		n.child = new_array2                                    //assing array
+
+		leaf = false
+
+		new.items = append(new.items, n.items[split_index+1:]...) //copy items
+		new_array := make([]int, 5)                               //new array
+		copy(new_array, n.items[:split_index])                    //turnucatw array
+		n.items = new_array                                       //ASSİNG array
+
+		new.child = append(new.child, n.child[split_index+1:]...) //copy items
+		new_array2 := make([]*node, 5)                            //new array
+		copy(new_array2, n.child[:split_index])                   //copy child
+		n.child = new_array2                                      //assing array
+
 	}
-	return item, &new
+	if len(n.child) == 0 {
+		leaf = true
+
+		new.items = append(new.items, n.items[split_index:]...) //copy items
+		new_array := make([]int, 5)                             //new array
+		copy(new_array, n.items[:split_index])                  //turnucatw array
+		n.items = new_array
+	}
+	return item, &new, leaf
 
 }
 
