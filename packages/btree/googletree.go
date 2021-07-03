@@ -188,7 +188,7 @@ func (s items) find(item Item) (index int, found bool) {
 	i := sort.Search(len(s), func(i int) bool {
 		return item.Less(s[i])
 	})
-	if i > 0 && !s[i-1].Less(item) {
+	if i > 0 && !s[i-1].Less(item) { //indexi 0 dan büyük ve kendindeki önce itemdan küçük olan
 		return i - 1, true
 	}
 	return i, false

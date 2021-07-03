@@ -1,8 +1,11 @@
 package bptree
 
+import "sort"
+
 type node struct {
-	items []int
-	child []*node
+	items   []int
+	child   []*node
+	numkeys int
 }
 
 type BTree struct {
@@ -83,12 +86,64 @@ func (n *node) split() (int, *node, bool) {
 // }
 
 func (n *node) find(value int) *node {
+	low := 0
+	find := false
+	if len(n.child) != 0 {
+		for x := 0; x < len(n.items); x++ {
 
+			if value < n.items[x] { // sıralı listede kendinden büyük en soldaki sayıyı bul
+
+				low = x
+				find = true
+				break
+			}
+		}
+	} else {
+		for x := 0; x < len(n.items); x++ { // son node ise itemi bul ve gönder
+			if value == n.items[x] {
+				return n
+			}
+		}
+		return nil
+	}
+	if !find {
+		if n.items[n.numkeys] < value {
+			return n.child[n.numkeys+1].find(value)
+		}
+
+	} else {
+		return n.child[low].find(value)
+	}
+	return nil
 }
+func (n *node) insertion_index(value int) (int, bool) {
+	i := sort.Search(len(n.items), func(i int) bool {
+		if value < n.items[i] {
+			return true
+
+		} else {
+			return false
+		}
+	})
+	if i > 0 && !n.items[i-1] < value {
+		return i - 1
+	}
+}
+func (n *node) insert(value int) {
+	to_inserted := n.find(value)
+}
+
+// func (n *node) insert(value int) {
+
+// }
 
 func (b *BTree) Insert(value int) {
 	if b.root == nil {
 		new_root := node{}
-		new_root.insert()
+		new_root.insert(value)
+		b.root = &new_root
+
+	} else {
+		b.root.insert(value)
 	}
 }
