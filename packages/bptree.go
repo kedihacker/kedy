@@ -90,7 +90,9 @@ func (n *node) split() (int, *node, bool) {
 // 	return out
 // }
 
-func (n *node) find(value int) *node {
+//hangi node insert edilecek, bulunup bulunmadığı
+//ilk value nil ise hata
+func (n *node) find(value int) (*node, bool) {
 	low := 0
 	find := false
 	if len(n.child) != 0 {
@@ -106,10 +108,11 @@ func (n *node) find(value int) *node {
 	} else {
 		for x := 0; x < len(n.items); x++ { // son node ise itemi bul ve gönder
 			if value == n.items[x] {
-				return n
+				return n, true
+
 			}
 		}
-		return nil
+		return n, false
 	}
 	if !find {
 		if n.items[n.numkeys] < value {
@@ -119,11 +122,12 @@ func (n *node) find(value int) *node {
 	} else {
 		return n.child[low].find(value)
 	}
-	return nil
+	return nil, false
 }
 
 // indexi bulur insetedilmesi gerken yere
 // eşitse doğru gönderiri
+// eşitse o zaman hangi indexte bulundupunu gönderirir
 func (n *node) insertion_index(value int) (int, bool) {
 	i := sort.Search(len(n.items), func(i int) bool { //valuedan büyük en soldaki ndexi veriri
 		if value < n.items[i] {
@@ -186,6 +190,9 @@ func main() {
 		child:   []*node{},
 		numkeys: 0,
 	}
-
-	fmt.Println("%+v %+v", nodi.insertion_index(6))
+	tobefound := 1
+	index, equal := nodi.insertion_index(tobefound)
+	fmt.Printf("%v %v\n", index, equal)
+	nodetoinset, iffound := nodi.find(tobefound)
+	fmt.Printf("%+v %v", nodetoinset, iffound)
 }
