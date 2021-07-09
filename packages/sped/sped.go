@@ -2,7 +2,7 @@ package main
 
 func main() {
 
-	for x := 0; x < 100000000000; x++ {
+	for x := 0; x < 10000000000; x++ {
 		continue
 	}
 }

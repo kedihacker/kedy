@@ -1,12 +1,17 @@
-package bptree
+package main
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 type node struct {
 	items   []int
 	child   []*node
 	numkeys int
 }
+
+const degree = 5
 
 type BTree struct {
 	degree int
@@ -116,8 +121,11 @@ func (n *node) find(value int) *node {
 	}
 	return nil
 }
+
+// indexi bulur insetedilmesi gerken yere
+// eşitse doğru gönderiri
 func (n *node) insertion_index(value int) (int, bool) {
-	i := sort.Search(len(n.items), func(i int) bool {
+	i := sort.Search(len(n.items), func(i int) bool { //valuedan büyük en soldaki ndexi veriri
 		if value < n.items[i] {
 			return true
 
@@ -125,25 +133,59 @@ func (n *node) insertion_index(value int) (int, bool) {
 			return false
 		}
 	})
-	if i > 0 && !n.items[i-1] < value {
-		return i - 1
+	if i > 0 && !(n.items[i-1] < value) { //listede olup olmadığını bulır
+		return i - 1, true
 	}
+	return i, false
 }
-func (n *node) insert(value int) {
-	to_inserted := n.find(value)
-}
+
+//bulundumu ve çağıran çağırdığı ı split etmelimi
+// func (n *node) insert(value int) (bool, bool) {
+// 	index, found := n.insertion_index(value)
+// 	if found {
+// 		return false, false
+// 	}
+// 	if len(n.child) == 0 { // buraya insert sonra split et geekitse
+// 		target_array := make([]int, 1)
+
+// 		copy(target_array, n.items[:index])
+// 		target_array = append(target_array, value)
+// 		copy(target_array, n.items[index:])
+
+// 		n.items = target_array
+// 		if !(len(n.items) < degree) {
+// 			return false, true
+// 		} else {
+// 			return false, false
+// 		}
+// 	} else { // çocuğu varsa
+
+// 	}
+
+// }
 
 // func (n *node) insert(value int) {
 
 // }
 
-func (b *BTree) Insert(value int) {
-	if b.root == nil {
-		new_root := node{}
-		new_root.insert(value)
-		b.root = &new_root
+// func (b *BTree) Insert(value int) {
+// 	if b.root == nil {
+// 		new_root := node{}
+// 		new_root.insert(value)
+// 		b.root = &new_root
 
-	} else {
-		b.root.insert(value)
+// 	} else {
+// 		b.root.insert(value)
+// 	}
+// }
+
+func main() {
+
+	nodi := node{
+		items:   []int{1, 2, 3, 7},
+		child:   []*node{},
+		numkeys: 0,
 	}
+
+	fmt.Println("%+v %+v", nodi.insertion_index(6))
 }

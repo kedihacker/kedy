@@ -185,10 +185,13 @@ func (s *items) truncate(index int) {
 // list.  'found' is true if the item already exists in the list at the given
 // index.
 func (s items) find(item Item) (index int, found bool) {
-	i := sort.Search(len(s), func(i int) bool {
+	i := sort.Search(len(s), func(i int) bool { //
+		/*itemdan büyük en soldaki indexi gönderir
+		 */
 		return item.Less(s[i])
 	})
-	if i > 0 && !s[i-1].Less(item) { //indexi 0 dan büyük ve kendindeki önce itemdan küçük olan
+	if i > 0 && !s[i-1].Less(item) { //indexi 0 dan büyük ve kendindeki önce itemdan küçük olursa çalışıyor aynı itemları bulmaya yarıyor
+
 		return i - 1, true
 	}
 	return i, false
@@ -316,7 +319,7 @@ func (n *node) insert(item Item, maxItems int) Item {
 		n.items.insertAt(i, item)
 		return nil
 	}
-	if n.maybeSplitChild(i, maxItems) {
+	if n.maybeSplitChild(i, maxItems) { //
 		inTree := n.items[i]
 		switch {
 		case item.Less(inTree):
