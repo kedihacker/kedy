@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"time"
 )
 
 type node struct {
@@ -32,6 +33,7 @@ type BTree struct {
 // }
 
 //right items copyied to new node
+// which item
 func (n *node) split() (int, *node, bool) {
 	new := node{}                   //new
 	split_index := len(n.items) / 2 // index to cut
@@ -42,21 +44,21 @@ func (n *node) split() (int, *node, bool) {
 		leaf = false
 
 		new.items = append(new.items, n.items[split_index+1:]...) //copy items
-		new_array := make([]int, 5)                               //new array
-		copy(new_array, n.items[:split_index])                    //turnucatw array
+		new_array := make([]int, 0)                               //new array
 		n.items = new_array                                       //ASSİNG array
+		copy(new_array, n.items[:split_index])                    //turnucatw array
 
 		new.child = append(new.child, n.child[split_index+1:]...) //copy items
-		new_array2 := make([]*node, 5)                            //new array
-		copy(new_array2, n.child[:split_index])                   //copy child
+		new_array2 := make([]*node, 0)                            //new array
 		n.child = new_array2                                      //assing array
+		copy(new_array2, n.child[:split_index])                   //copy child
 
 	}
 	if len(n.child) == 0 {
 		leaf = true
 
 		new.items = append(new.items, n.items[split_index:]...) //copy items
-		new_array := make([]int, 5)                             //new array
+		new_array := make([]int, len(n.items)-2)                //new array 2
 		copy(new_array, n.items[:split_index])                  //turnucatw array
 		n.items = new_array
 	}
@@ -143,30 +145,33 @@ func (n *node) insertion_index(value int) (int, bool) {
 	return i, false
 }
 
-//bulundumu ve çağıran çağırdığı ı split etmelimi
-// func (n *node) insert(value int) (bool, bool) {
-// 	index, found := n.insertion_index(value)
-// 	if found {
-// 		return false, false
-// 	}
-// 	if len(n.child) == 0 { // buraya insert sonra split et geekitse
-// 		target_array := make([]int, 1)
+// bulundumu ve çağıran çağırdığı ı split etmelimi
+func (n *node) insert(value int) (bool, bool) {
+	index, found := n.insertion_index(value)
+	if found {
+		return false, false
+	}
+	if len(n.child) == 0 { // buraya insert sonra split et geekitse
+		target_array := make([]int, 1)
 
-// 		copy(target_array, n.items[:index])
-// 		target_array = append(target_array, value)
-// 		copy(target_array, n.items[index:])
+		copy(target_array, n.items[:index])
+		target_array = append(target_array, value)
+		copy(target_array, n.items[index:])
 
-// 		n.items = target_array
-// 		if !(len(n.items) < degree) {
-// 			return false, true
-// 		} else {
-// 			return false, false
-// 		}
-// 	} else { // çocuğu varsa
+		n.items = target_array
+		if !(len(n.items) < degree) {
+			return false, true
+		} else {
+			return false, false
+		}
+	} else { // çocuğu varsa
+		exists, full := n.child[index].insert(value)
+		if exists == true {
+			return
+		}
+	}
 
-// 	}
-
-// }
+}
 
 // func (n *node) insert(value int) {
 
@@ -186,13 +191,21 @@ func (n *node) insertion_index(value int) (int, bool) {
 func main() {
 
 	nodi := node{
-		items:   []int{1, 2, 3, 7},
+		items:   []int{1, 3, 5, 7, 10},
 		child:   []*node{},
 		numkeys: 0,
 	}
-	tobefound := 1
+
+	// start := time.Now()
+	// item, new_nodi, İsleaf := nodi.split()
+	// procestime := time.Since(start)
+	// fmt.Println(procestime)
+	start := time.Now()
+	// fmt.Printf("split item %v; new node %+v ; old node %+v ; is leaf %v", item, new_nodi, nodi, İsleaf)
+	tobefound := 0
 	index, equal := nodi.insertion_index(tobefound)
-	fmt.Printf("%v %v\n", index, equal)
 	nodetoinset, iffound := nodi.find(tobefound)
-	fmt.Printf("%+v %v", nodetoinset, iffound)
+	fmt.Printf("%v %v\n", index, equal)
+	fmt.Printf("%+v %v\n", nodetoinset, iffound)
+	fmt.Print(time.Since(start).Milliseconds())
 }
