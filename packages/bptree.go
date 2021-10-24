@@ -167,7 +167,12 @@ func (n *node) insert(value int) (bool, bool) {
 	} else { // çocuğu varsa
 		exists, full := n.child[index].insert(value)
 		if exists == true {
-			return
+			return true, false
+		}
+		if full {
+			item, newnode, child := n.child[index].split()
+			n.child = append(n.child[index+1], n.child[index])
+			n.child[index] = newnode
 		}
 	}
 
