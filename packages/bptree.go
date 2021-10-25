@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"sort"
-	"time"
 )
 
 type node struct {
@@ -170,9 +168,12 @@ func (n *node) insert(value int) (bool, bool) {
 			return true, false
 		}
 		if full {
-			item, newnode, child := n.child[index].split()
-			n.child = append(n.child[index+1], n.child[index])
+			item, newnode, _ := n.child[index].split()
+			n.child = append(n.child[:index+1], n.child[index:]...)
 			n.child[index] = newnode
+			n.items = append(n.items[:index+1], n.items[index:]...)
+			n.items[index] = item
+			return false, !(len(n.items) < degree)
 		}
 	}
 
@@ -182,16 +183,24 @@ func (n *node) insert(value int) (bool, bool) {
 
 // }
 
-// func (b *BTree) Insert(value int) {
-// 	if b.root == nil {
-// 		new_root := node{}
-// 		new_root.insert(value)
-// 		b.root = &new_root
+func (b *BTree) Insert(value int) {
+	if b.root == nil {
+		new_root := node{}
+		new_root.insert(value)
+		b.root = &new_root
 
-// 	} else {
-// 		b.root.insert(value)
-// 	}
-// }
+	} else {
+		_, split := b.root.insert(value)
+		if split {
+			item, newnode, _ := b.root.split()
+			newroot := &node{}
+			newroot.items[0] = item
+			newroot.child[0] = b.root
+			newroot.child[1] = newnode
+			b.root = newroot
+		}
+	}
+}
 
 func main() {
 
@@ -201,16 +210,4 @@ func main() {
 		numkeys: 0,
 	}
 
-	// start := time.Now()
-	// item, new_nodi, İsleaf := nodi.split()
-	// procestime := time.Since(start)
-	// fmt.Println(procestime)
-	start := time.Now()
-	// fmt.Printf("split item %v; new node %+v ; old node %+v ; is leaf %v", item, new_nodi, nodi, İsleaf)
-	tobefound := 0
-	index, equal := nodi.insertion_index(tobefound)
-	nodetoinset, iffound := nodi.find(tobefound)
-	fmt.Printf("%v %v\n", index, equal)
-	fmt.Printf("%+v %v\n", nodetoinset, iffound)
-	fmt.Print(time.Since(start).Milliseconds())
 }
