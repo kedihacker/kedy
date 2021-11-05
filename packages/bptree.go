@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
 	"sort"
+	"time"
 )
 
 type node struct {
@@ -152,9 +155,9 @@ func (n *node) insert(value int) (bool, bool) {
 	if len(n.child) == 0 { // buraya insert sonra split et geekitse
 		target_array := make([]int, 1)
 
-		copy(target_array, n.items[:index])
+		target_array = append(target_array, n.items[:index]...)
 		target_array = append(target_array, value)
-		copy(target_array, n.items[index:])
+		target_array = append(target_array, n.items[index:]...)
 
 		n.items = target_array
 		if !(len(n.items) < degree) {
@@ -164,16 +167,18 @@ func (n *node) insert(value int) (bool, bool) {
 		}
 	} else { // çocuğu varsa
 		exists, full := n.child[index].insert(value)
-		if exists == true {
+		if exists {
 			return true, false
 		}
 		if full {
 			item, newnode, _ := n.child[index].split()
 			n.child = append(n.child[:index+1], n.child[index:]...)
-			n.child[index] = newnode
+			n.child[index+1] = newnode
 			n.items = append(n.items[:index+1], n.items[index:]...)
-			n.items[index] = item
+			n.items[index+1] = item
 			return false, !(len(n.items) < degree)
+		} else {
+			return false, false
 		}
 	}
 
@@ -185,29 +190,42 @@ func (n *node) insert(value int) (bool, bool) {
 
 func (b *BTree) Insert(value int) {
 	if b.root == nil {
-		new_root := node{}
+		fmt.Print("tree is nil added")
+		new_root := &node{}
 		new_root.insert(value)
-		b.root = &new_root
+		b.root = new_root
 
 	} else {
 		_, split := b.root.insert(value)
 		if split {
 			item, newnode, _ := b.root.split()
 			newroot := &node{}
-			newroot.items[0] = item
-			newroot.child[0] = b.root
-			newroot.child[1] = newnode
+			newroot.items = append(newroot.items, item)
+			newroot.child = append(newroot.child, b.root)
+			newroot.child = append(newroot.child, newnode)
 			b.root = newroot
 		}
 	}
 }
 
 func main() {
+	tree := &BTree{}
+	source := rand.NewSource(time.Now().Unix())
+	r := rand.New(source)
 
-	nodi := node{
-		items:   []int{1, 3, 5, 7, 10},
-		child:   []*node{},
-		numkeys: 0,
-	}
+	tree.Insert(int(r.Int63n(1213213)))
+	fmt.Println(tree.root)
 
+	tree.Insert(int(r.Int63n(1213213)))
+	fmt.Println(tree.root)
+	tree.Insert(int(r.Int63n(1213213)))
+	tree.Insert(int(r.Int63n(1213213)))
+	fmt.Println(tree.root)
+	tree.Insert(int(r.Int63n(1213213)))
+	fmt.Println(tree.root)
+	tree.Insert(int(r.Int63n(1213213)))
+	tree.Insert(int(r.Int63n(1213213)))
+	tree.Insert(int(r.Int63n(1213213)))
+
+	fmt.Printf("%#v\n", tree.root)
 }
