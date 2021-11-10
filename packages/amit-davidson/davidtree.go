@@ -74,20 +74,12 @@ func (b *Tree) Put(key string, value interface{}) {
 func main() {
 	minimumItemsInNode := DefaultMinItems
 	tree := NewTree(minimumItemsInNode)
-	value := "0"
-	tree.Put(value, value)
-	value = "2"
-	tree.Put(value, value)
-	value = "1"
-	tree.Put(value, value)
 
-	retVal := tree.Find(value)
-	fmt.Printf("Returned value is key:%s value:%s \n", retVal.key, retVal.value)
+	for x := 0; x < 1000000; x++ {
+		tree.Put(string(rune(x)), string(rune(x)))
+	}
 
-	tree.Remove(value)
-
-	retVal = tree.Find(value)
-	fmt.Print("Returned value is nil")
+	// fmt.Print("Returned value is nil")
 }
 
 // Remove removes a key from the tree. It finds the correct node and the index to remove the item from and removes it.
@@ -246,8 +238,9 @@ func (n *Node) addChild(node *Node, insertionIndex int) {
 	if len(n.childNodes) == insertionIndex { // nil or empty slice or after last element
 		n.childNodes = append(n.childNodes, node)
 	}
-
+	fmt.Println(n.childNodes)
 	n.childNodes = append(n.childNodes[:insertionIndex+1], n.childNodes[insertionIndex:]...)
+	fmt.Println(n.childNodes)
 	n.childNodes[insertionIndex] = node
 }
 
